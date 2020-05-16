@@ -107,23 +107,44 @@ bool is_neighbours(const point& first, const point& second, const vector<border>
 	return true;
 }
 
-vector<point> find_finish(const int(&map)[9][9], int player_number) {
+vector<point> find_finish(const byte(&map)[9][9], const byte& player_number) {
 	byte x = (player_number == 1 ? 8 : 0);
 
 	vector<point> res{ {x + 1, 1} };
 	byte min_val = map[x][0];
 
 	for (byte y = 1; y < 9; y++) {
-		if (map[x][y] < min_val)
+		if (map[x][y] < min_val) {
 			res = vector<point>{ {x + 1, y + 1} };
+			min_val = map[x][y];
+		}
 		else if (map[x][y] == min_val)
 			res.push_back(point{ x + 1, y + 1 });
 	}
 	return res;
 }
 
-vector<way> shortest_ways(vector<border>& borders, const point& player_position, int player_number) {
-	int field[9][9] = { 0 };
+vector<way> back_way(const point& now, const byte(&map)[9][9]) {
+	if (map[now.x - 1][now.y - 1] == 1)
+		return { {{now}} };
+	vector<way> result;
+
+	auto now_value = map[now.x - 1][now.y - 1];
+
+	for (const auto& my_point : { now.up(), now.down(), now.left(), now.right() }) {
+		auto my_value = map[my_point.x - 1][my_point.y - 1];
+		if (my_point.is_ok() && my_value == now_value - 1) {
+			for (auto& my_way : back_way(my_point, map)) {
+				my_way.push_back(now);
+				result.push_back(my_way);
+			}
+		}
+	}
+	return result;
+}
+
+vector<way> shortest_ways(const vector<border>& borders, const point& player_position, const byte& player_number) {
+	byte field[9][9] = { 0 };
 	field[player_position.x-1][player_position.y-1] = 1;
 
 	vector<point> search{player_position};
@@ -154,29 +175,21 @@ vector<way> shortest_ways(vector<border>& borders, const point& player_position,
 	vector<way> ways;
 	for (auto& finish : find_finish(field, player_number)) {
 		way my_way{ finish };
-		while (field[finish.x - 1][finish.y - 1] != 1)
-		{
-			for (const auto& my_point : { finish.up(), finish.down(), finish.left(), finish.right() }) {
-				if (field[my_point.x - 1][my_point.y - 1] == field[finish.x - 1][finish.y - 1] - 1) {
-					my_way.push_back(my_point);
-					finish = my_point;
-					break;
-				}
-			}
+		for (const auto& my_way : back_way(finish, field)) {
+			ways.push_back(my_way);
 		}
-		ways.push_back(my_way);
 	}
 	return ways;
 }
 
 
-string our_move(BoardState& board_state, int player_number) {
+string our_move(BoardState& board_state, const byte& player_number) {
 	auto first_player_ways = shortest_ways(board_state.borders, board_state.first_player, 1);
 	auto second_player_ways = shortest_ways(board_state.borders, board_state.second_player, 2);
 	return " ";
 }
 
-void round(BoardState& board_state, int player_number)
+void round(BoardState& board_state, const byte& player_number)
 {
 	if (player_number == 1)
 		cout << our_move(board_state, player_number) << endl;
@@ -210,8 +223,9 @@ int main()
 	byte player_number = 1;
 
 	BoardState board_state;
-
-	cin >> player_number;
+	board_state.borders.push_back({ 2, 4, 2, 6 });
+	board_state.borders.push_back({ 3, 5, 3, 7 });
+	//cin >> player_number;
 	while (true) {
 		//auto beg = std::chrono::steady_clock::now();
 		round(board_state, player_number);
