@@ -7,6 +7,7 @@
 using std::vector;
 using byte = std::int16_t;
 using std::string;
+using std::to_string;
 using std::cout;
 using std::cin;
 using std::endl;
@@ -51,6 +52,10 @@ struct point {
 		this->y = pnt.y;
 		return *this;
 	}
+
+	string to_string() {
+		return std::to_string(x) + " " + std::to_string(y);
+	}
 };
 
 std::ostream& operator<<(std::ostream& out, const point& pnt) {
@@ -65,6 +70,10 @@ bool operator==(const point& lhs, const point& rhs) {
 struct border {
 	point beg;
 	point end;
+
+	string to_string() {
+		return beg.to_string() + " " + end.to_string();
+	}
 };
 
 struct BoardState {
@@ -132,7 +141,7 @@ vector<point> find_finish(const byte(&map)[9][9], const byte& player_number) {
 	byte min_val = map[x][0];
 
 	for (byte y = 1; y < 9; y++) {
-		if (map[x][y] < min_val) {
+		if ((map[x][y] < min_val && map[x][y] != 0) || min_val == 0) {
 			res = vector<point>{ {x + 1, y + 1} };
 			min_val = map[x][y];
 		}
@@ -179,13 +188,13 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 		}
 	}
 
-	for (int x = 9; x > 0; x--) {
+	/*for (int x = 9; x > 0; x--) {
 		for (int y = 0; y < 9; y++)
 			std::cout << std::setw(2) << field[x - 1][y] << ' ';
 		std::cout << '\n';
 	}
 
-	cout << endl;
+	cout << endl;*/
 
 	vector<way> ways;
 	for (auto& finish : find_finish(field, player_number)) {
@@ -215,9 +224,9 @@ byte benefit(const way& player_1, const way& player_2) {
 
 string our_move(BoardState& board_state, int player_number) {
 	way best_way;
-	byte max_benefit = 0;
+	byte max_benefit = INT16_MIN;
 	for (const way& w1 : shortest_ways(board_state.borders, board_state.first_player, 1))
-		for (const way& w2 : shortest_ways(board_state.borders, board_state.first_player, 2)) {
+		for (const way& w2 : shortest_ways(board_state.borders, board_state.second_player, 2)) {
 			byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
 			if (cur_benefit > max_benefit) {
 				max_benefit = cur_benefit;
@@ -227,7 +236,7 @@ string our_move(BoardState& board_state, int player_number) {
 
 	vector<border> temp = board_state.borders;
 	border best_border;
-	byte new_max_benefit = 0;
+	byte new_max_benefit = INT16_MIN;
 	for (byte delta = 0; delta < 2; delta++)
 		for (byte i = 1; i <= 7; i++)
 			for (byte j = 2; j <= 9; j++) {
@@ -235,7 +244,7 @@ string our_move(BoardState& board_state, int player_number) {
 				if (board_state.is_valid_border(bord)) {
 					temp.push_back(bord);
 					for (const way& w1 : shortest_ways(temp, board_state.first_player, 1))
-						for (const way& w2 : shortest_ways(temp, board_state.first_player, 2)) {
+						for (const way& w2 : shortest_ways(temp, board_state.second_player, 2)) {
 							byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
 							if (cur_benefit > new_max_benefit) {
 								new_max_benefit = cur_benefit;
@@ -247,9 +256,9 @@ string our_move(BoardState& board_state, int player_number) {
 			}
 
 	if (new_max_benefit > max_benefit) {
-		return "partition";
+		return "partition " + best_border.to_string();
 	}
-	else return "move";
+	else return "move " + best_way[1].to_string();
 }
 
 void round(BoardState& board_state, const byte& player_number)
@@ -286,7 +295,7 @@ int main()
 	byte player_number = 1;
 
 	BoardState board_state;
-	board_state.borders.push_back({ {3,3}, {3,5} });
+	/*board_state.borders.push_back({ {3,3}, {3,5} });
 	board_state.borders.push_back({ {1,5}, {3,5} });
 	board_state.borders.push_back({ {2,5}, {2,7} });
 	board_state.borders.push_back({ {3,6}, {3,8} });
@@ -297,7 +306,7 @@ int main()
 	board_state.borders.push_back({ {7,7}, {5,7} });
 	board_state.borders.push_back({ {5,7}, {5,9} });
 	board_state.borders.push_back({ {5,9}, {3,9} });
-	board_state.borders.push_back({ {3,1}, {3,3} });
+	board_state.borders.push_back({ {3,1}, {3,3} });*/
 
 	cin >> player_number;
 	while (true) {
