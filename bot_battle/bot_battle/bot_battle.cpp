@@ -13,6 +13,11 @@ using std::endl;
 
 
 
+struct BoardState {
+	vector<border> borders;
+	point first_player;
+	point second_player;
+};
 
 struct point {
 	byte x;
@@ -158,39 +163,25 @@ vector<way> shortest_way(vector<border> borders, point player_position, int play
 }
 
 
-//int main() {
-//	auto start = point{ 1,5 };
-//	vector<border> arr;
-//	//arr.push_back({ 4, 4, 4, 6 });
-//	//arr.push_back({ 3, 5, 3, 7 });
-//	arr.push_back({ {3,3}, {3,5} });
-//	arr.push_back({ {1,5}, {3,5} });
-//	arr.push_back({ {2,5}, {2,7} });
-//	arr.push_back({ {3,6}, {3,8} });
-//	arr.push_back({ {1,8}, {3,8} });
-//	arr.push_back({ {3,5}, {5,5} });
-//	arr.push_back({ {5,5}, {7,5} });
-//	arr.push_back({ {7,5}, {7,7} });
-//	arr.push_back({ {7,7}, {5,7} });
-//	arr.push_back({ {5,7}, {5,9} });
-//	arr.push_back({ {5,9}, {3,9} });
-//
-//	auto x = shortest_way(arr, start, 1);
-//
-//	return 0;
-//}
-
-const char* our_move() {
+string our_move(BoardState& board_state, int player_number) {
 	return " ";
 }
 
-void round(vector<border> borders, int player_number)
+void round(BoardState& board_state, int player_number)
 {
 	if (player_number == 1)
 		cout << our_move(board_state, player_number) << endl;
+
 	string opponents_move;
 	cin >> opponents_move;
-	Update_board_state(board_state, opponents_move);
+
+	if (opponents_move == "move") {
+
+	}
+	else {
+
+	}
+
 	if (player_number == 2)
 		cout << our_move(board_state, player_number) << endl;
 
@@ -200,11 +191,11 @@ int main()
 {
 	int player_number;
 
-	vector<border> borders;
+	BoardState board_state;
 
 	cin >> player_number;
 	while (true) {
-		round(borders, player_number);
+		round(board_state, player_number);
 	}
 
 }
