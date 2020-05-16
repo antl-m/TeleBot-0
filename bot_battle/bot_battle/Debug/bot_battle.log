@@ -1,0 +1,3 @@
+﻿  bot_battle.cpp
+C:\Users\Best PC\source\repos\bot_battle\bot_battle\bot_battle.cpp(117,17): warning C4018: <: несоответствие типов со знаком и без знака
+  bot_battle.vcxproj -> C:\Users\Best PC\source\repos\bot_battle\Debug\bot_battle.exe
