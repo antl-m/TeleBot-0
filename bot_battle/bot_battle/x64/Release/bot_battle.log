@@ -1,7 +1,9 @@
 ﻿  bot_battle.cpp
-  Создание кода
-  1 of 253 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    6 functions had inline decision re-evaluated but remain unchanged
-  Создание кода завершено
-  bot_battle.vcxproj -> C:\Users\Best PC\Desktop\Context\bot_battle\x64\Release\bot_battle.exe
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(175,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(176,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
+  Generating code
+  311 of 311 functions (100.0%) were compiled.
+    72 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  bot_battle.vcxproj -> C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\x64\Release\bot_battle.exe
