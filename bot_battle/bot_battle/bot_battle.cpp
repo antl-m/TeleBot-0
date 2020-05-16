@@ -11,8 +11,10 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-
-
+template<class T>
+T& min(T& lhs, T& rhs) {
+	return (lhs < rhs ? lhs : rhs);
+}
 
 struct point {
 	byte x;
@@ -27,21 +29,20 @@ struct point {
 	}
 
 	point left() const {
-		return point{ x, y - 1};
+		return point{ x, y - 1 };
 	}
 
 	point right() const {
-		return point{ x, y + 1};
+		return point{ x, y + 1 };
 	}
 
 	bool is_ok() const {
-		if (x < 0 || y < 0) {
+		if (x <= 0 || y <= 0) {
 			return false;
 		}
 		if (x > 9 || y > 9) {
 			return false;
 		}
-
 		return true;
 	}
 
@@ -70,6 +71,23 @@ struct BoardState {
 	vector<border> borders;
 	point first_player{ 1, 5 };
 	point second_player{ 9, 5 };
+
+	bool is_valid_border(const border& bord) {
+		for (const border& b : borders) {
+			if (bord.beg == b.beg && bord.end == b.end)
+				return false;
+
+			if (bord.beg == point{ b.beg.x - 1, b.beg.y - 1 } && bord.end == point{ b.end.x + 1 , b.end.y + 1 })
+				return false;
+			else if (bord.beg == point{ b.end.x - 1, b.end.y - 1 } && bord.end == point{ b.beg.x + 1 , b.beg.y + 1 })
+				return false;
+			else if (bord.beg.x == bord.end.x && b.beg.x == b.end.x && (b.beg == bord.beg.right() || b.end == bord.beg.right()))
+				return false;
+			else if (bord.beg.y == bord.end.y && b.beg.y == b.end.y && (b.beg == bord.beg.up() || b.end == bord.beg.up()))
+				return false;
+		}
+		return true;
+	}
 };
 
 using way = vector<point>;
@@ -147,26 +165,23 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 	byte field[9][9] = { 0 };
 	field[player_position.x-1][player_position.y-1] = 1;
 
-	vector<point> search{player_position};
+	vector<point> search{ player_position };
 	byte current = 0;
 
 	while (current < search.size())
 	{
 		point now = search[current++];
-
 		for (const auto& next : { now.up(), now.down(), now.left(), now.right() }) {
-
 			if (field[next.x - 1][next.y - 1] == 0 && next.is_ok() && is_neighbours(now, next, borders)) {
 				search.push_back(next);
-				field[next.x - 1][next.y - 1] = field[now.x - 1][now.y - 1]+1;
+				field[next.x - 1][next.y - 1] = field[now.x - 1][now.y - 1] + 1;
 			}
-
 		}
 	}
-	
+
 	for (int x = 9; x > 0; x--) {
 		for (int y = 0; y < 9; y++)
-			std::cout << std::setw(2) << field[x-1][y] << ' ';
+			std::cout << std::setw(2) << field[x - 1][y] << ' ';
 		std::cout << '\n';
 	}
 
@@ -182,11 +197,59 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 	return ways;
 }
 
+byte benefit(const way& player_1, const way& player_2) {
+	byte size_1 = player_1.size();
+	byte size_2 = player_2.size();
+	for (byte i = 0; i < min(size_1, size_2) - 1; i++) {
+		if (player_1[i + 1] == player_2[i + 1]) {
+			size_2--;
+			break;
+		}
+		else if (player_1[i + 1] == player_2[i]) {
+			size_1--;
+			break;
+		}
+	}
+	return size_1 - size_2;
+}
 
-string our_move(BoardState& board_state, const byte& player_number) {
-	auto first_player_ways = shortest_ways(board_state.borders, board_state.first_player, 1);
-	auto second_player_ways = shortest_ways(board_state.borders, board_state.second_player, 2);
-	return " ";
+string our_move(BoardState& board_state, int player_number) {
+	way best_way;
+	byte max_benefit = 0;
+	for (const way& w1 : shortest_ways(board_state.borders, board_state.first_player, 1))
+		for (const way& w2 : shortest_ways(board_state.borders, board_state.first_player, 2)) {
+			byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
+			if (cur_benefit > max_benefit) {
+				max_benefit = cur_benefit;
+				best_way = (player_number == 1 ? w1 : w2);
+			}
+		}
+
+	vector<border> temp = board_state.borders;
+	border best_border;
+	byte new_max_benefit = 0;
+	for (byte delta = 0; delta < 2; delta++)
+		for (byte i = 1; i <= 7; i++)
+			for (byte j = 2; j <= 9; j++) {
+				border bord = (delta == 0 ? border{ i, j, i + 2, j } : border{ j, i, j, i + 2 });
+				if (board_state.is_valid_border(bord)) {
+					temp.push_back(bord);
+					for (const way& w1 : shortest_ways(temp, board_state.first_player, 1))
+						for (const way& w2 : shortest_ways(temp, board_state.first_player, 2)) {
+							byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
+							if (cur_benefit > new_max_benefit) {
+								new_max_benefit = cur_benefit;
+								best_border = bord;
+							}
+						}
+					temp.pop_back();
+				}
+			}
+
+	if (new_max_benefit > max_benefit) {
+		return "partition";
+	}
+	else return "move";
 }
 
 void round(BoardState& board_state, const byte& player_number)
@@ -223,9 +286,20 @@ int main()
 	byte player_number = 1;
 
 	BoardState board_state;
-	board_state.borders.push_back({ 2, 4, 2, 6 });
-	board_state.borders.push_back({ 3, 5, 3, 7 });
-	//cin >> player_number;
+	board_state.borders.push_back({ {3,3}, {3,5} });
+	board_state.borders.push_back({ {1,5}, {3,5} });
+	board_state.borders.push_back({ {2,5}, {2,7} });
+	board_state.borders.push_back({ {3,6}, {3,8} });
+	board_state.borders.push_back({ {1,8}, {3,8} });
+	board_state.borders.push_back({ {3,5}, {5,5} });
+	board_state.borders.push_back({ {5,5}, {7,5} });
+	board_state.borders.push_back({ {7,5}, {7,7} });
+	board_state.borders.push_back({ {7,7}, {5,7} });
+	board_state.borders.push_back({ {5,7}, {5,9} });
+	board_state.borders.push_back({ {5,9}, {3,9} });
+	board_state.borders.push_back({ {3,1}, {3,3} });
+
+	cin >> player_number;
 	while (true) {
 		//auto beg = std::chrono::steady_clock::now();
 		round(board_state, player_number);
