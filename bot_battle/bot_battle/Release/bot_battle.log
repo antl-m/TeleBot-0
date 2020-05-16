@@ -1,0 +1,13 @@
+﻿  bot_battle.cpp
+C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(130,17): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(218,11): warning C4244: инициализация: преобразование "_Rep" в "int", возможна потеря данных
+          with
+          [
+              _Rep=__int64
+          ]
+  Создание кода
+  1 of 259 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  bot_battle.vcxproj -> C:\Users\Best PC\Desktop\Context\bot_battle\Release\bot_battle.exe

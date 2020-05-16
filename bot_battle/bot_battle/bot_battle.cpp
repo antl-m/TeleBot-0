@@ -1,11 +1,11 @@
 ﻿#include <iostream>
 #include <vector>
-#include <algorithm>
 #include <iomanip>
 #include <string>
+#include <chrono>
 
 using std::vector;
-using byte = signed char;
+using byte = std::int16_t;
 using std::string;
 using std::cout;
 using std::cin;
@@ -13,11 +13,6 @@ using std::endl;
 
 
 
-struct BoardState {
-	vector<border> borders;
-	point first_player;
-	point second_player;
-};
 
 struct point {
 	byte x;
@@ -71,6 +66,12 @@ struct border {
 	point end;
 };
 
+struct BoardState {
+	vector<border> borders;
+	point first_player{ 1, 5 };
+	point second_player{ 9, 5 };
+};
+
 using way = vector<point>;
 
 bool is_neighbours(const point& first, const point& second, const vector<border>& borders) {
@@ -108,16 +109,20 @@ bool is_neighbours(const point& first, const point& second, const vector<border>
 
 vector<point> find_finish(const int(&map)[9][9], int player_number) {
 	byte x = (player_number == 1 ? 8 : 0);
-	vector<point> res;
-	byte min_val = std::min({ map[x][0], map[x][1], map[x][2], map[x][3], map[x][4], map[x][5], map[x][6], map[x][7], map[x][8] });;
-	for (byte y = 0; y < 9; y++) {
-		if (map[x][y] == min_val)
+
+	vector<point> res{ {x + 1, 1} };
+	byte min_val = map[x][0];
+
+	for (byte y = 1; y < 9; y++) {
+		if (map[x][y] < min_val)
+			res = vector<point>{ {x + 1, y + 1} };
+		else if (map[x][y] == min_val)
 			res.push_back(point{ x + 1, y + 1 });
 	}
 	return res;
 }
 
-vector<way> shortest_way(vector<border> borders, point player_position, int player_number) {
+vector<way> shortest_ways(vector<border>& borders, const point& player_position, int player_number) {
 	int field[9][9] = { 0 };
 	field[player_position.x-1][player_position.y-1] = 1;
 
@@ -130,7 +135,7 @@ vector<way> shortest_way(vector<border> borders, point player_position, int play
 
 		for (const auto& next : { now.up(), now.down(), now.left(), now.right() }) {
 
-			if (next.is_ok() && field[next.x - 1][next.y - 1] == 0 && is_neighbours(now, next, borders)) {
+			if (field[next.x - 1][next.y - 1] == 0 && next.is_ok() && is_neighbours(now, next, borders)) {
 				search.push_back(next);
 				field[next.x - 1][next.y - 1] = field[now.x - 1][now.y - 1]+1;
 			}
@@ -141,8 +146,10 @@ vector<way> shortest_way(vector<border> borders, point player_position, int play
 	for (int x = 9; x > 0; x--) {
 		for (int y = 0; y < 9; y++)
 			std::cout << std::setw(2) << field[x-1][y] << ' ';
-		std::cout << std::endl;
+		std::cout << '\n';
 	}
+
+	cout << endl;
 
 	vector<way> ways;
 	for (auto& finish : find_finish(field, player_number)) {
@@ -164,6 +171,8 @@ vector<way> shortest_way(vector<border> borders, point player_position, int play
 
 
 string our_move(BoardState& board_state, int player_number) {
+	auto first_player_ways = shortest_ways(board_state.borders, board_state.first_player, 1);
+	auto second_player_ways = shortest_ways(board_state.borders, board_state.second_player, 2);
 	return " ";
 }
 
@@ -176,10 +185,19 @@ void round(BoardState& board_state, int player_number)
 	cin >> opponents_move;
 
 	if (opponents_move == "move") {
+		byte x, y;
+		cin >> x >> y;
 
+		if (player_number == 1)
+			board_state.second_player = point{ x, y };
+		else
+			board_state.first_player = point{ x, y };
 	}
 	else {
+		byte x1, y1, x2, y2;
+		cin >> x1 >> y1 >> x2 >> y2;
 
+		board_state.borders.push_back(border{ x1, y1, x2, y2 });
 	}
 
 	if (player_number == 2)
@@ -189,13 +207,17 @@ void round(BoardState& board_state, int player_number)
 
 int main()
 {
-	int player_number;
+	byte player_number = 1;
 
 	BoardState board_state;
 
 	cin >> player_number;
 	while (true) {
+		//auto beg = std::chrono::steady_clock::now();
 		round(board_state, player_number);
+		//auto end = std::chrono::steady_clock::now();
+
+		//cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
 	}
 
 }
