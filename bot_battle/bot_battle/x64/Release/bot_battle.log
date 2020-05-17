@@ -1,7 +1,7 @@
 ﻿  bot_battle.cpp
-  Создание кода
-  8 of 410 functions ( 2.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
+  Generating code
+  413 of 413 functions (100.0%) were compiled.
+    14 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
-  Создание кода завершено
-  bot_battle.vcxproj -> C:\Users\Best PC\Desktop\Context\bot_battle\x64\Release\bot_battle.exe
+  Finished generating code
+  bot_battle.vcxproj -> C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\x64\Release\bot_battle.exe
