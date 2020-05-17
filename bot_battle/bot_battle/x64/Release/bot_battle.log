@@ -1,9 +1,9 @@
 ﻿  bot_battle.cpp
-C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(210,31): warning C4267: инициализация: преобразование из "size_t" в "byte"; возможна потеря данных
-C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(211,31): warning C4267: инициализация: преобразование из "size_t" в "byte"; возможна потеря данных
-  Создание кода
-  2 of 410 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(210,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(211,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
+  Generating code
+  413 of 413 functions (100.0%) were compiled.
+    96 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
   bot_battle.vcxproj -> C:\Users\Best PC\Desktop\Context\bot_battle\x64\Release\bot_battle.exe
