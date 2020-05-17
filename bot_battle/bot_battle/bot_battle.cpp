@@ -151,7 +151,7 @@ vector<point> find_finish(const byte(&map)[9][9], const byte& player_number) {
 	return res;
 }
 
-vector<way> back_way(const point& now, const byte(&map)[9][9]) {
+vector<way> back_way(const point& now, const byte(&map)[9][9], const vector<border>& borders) {
 	if (map[now.x - 1][now.y - 1] == 1)
 		return { {{now}} };
 	vector<way> result;
@@ -160,8 +160,8 @@ vector<way> back_way(const point& now, const byte(&map)[9][9]) {
 
 	for (const auto& my_point : { now.up(), now.down(), now.left(), now.right() }) {
 		auto my_value = map[my_point.x - 1][my_point.y - 1];
-		if (my_point.is_ok() && my_value == now_value - 1) {
-			for (auto& my_way : back_way(my_point, map)) {
+		if (my_point.is_ok() && my_value == now_value - 1 && is_neighbours(my_point, now, borders)) {
+			for (auto& my_way : back_way(my_point, map, borders)) {
 				my_way.push_back(now);
 				result.push_back(my_way);
 			}
@@ -199,7 +199,7 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 	vector<way> ways;
 	for (auto& finish : find_finish(field, player_number)) {
 		way my_way{ finish };
-		for (const auto& my_way : back_way(finish, field)) {
+		for (const auto& my_way : back_way(finish, field, borders)) {
 			ways.push_back(my_way);
 		}
 	}
@@ -263,17 +263,25 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 	//}
 	//cout << endl;
 
-	if (border_count < 10 && (new_max_benefit > max_benefit)) {
+	if (border_count < 10 && (new_max_benefit > max_benefit) && max_benefit < 0) {
 		board_state.borders.push_back(best_border);
 		border_count++;
 		return "partition " + best_border.to_string();
 	}
 	else {
 		auto new_point = best_way[1];
-		if (player_number == 1)
-			board_state.first_player = new_point;
-		else
-			board_state.first_player = new_point;
+		if (player_number == 1) {
+			if (new_point == board_state.second_player)
+				board_state.first_player = best_way[2];
+			else
+				board_state.first_player = new_point;
+		}
+		else {
+			if (new_point == board_state.first_player)
+				board_state.second_player = best_way[2];
+			else
+				board_state.second_player = new_point;
+		}
 
 		return "move " + new_point.to_string();
 	}
@@ -281,12 +289,11 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 
 void round(BoardState& board_state, const byte& player_number, byte& border_count)
 {
-	//auto beg = std::chrono::steady_clock::now();
+	auto beg = std::chrono::steady_clock::now();
 	if (player_number == 1)
 		cout << our_move(board_state, player_number, border_count) << endl;
-	//auto end = std::chrono::steady_clock::now();
-
-	//cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
+	auto end = std::chrono::steady_clock::now();
+	cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
 
 	string opponents_move;
 	cin >> opponents_move;
@@ -325,10 +332,6 @@ int main()
 	//cout << is_neighbours(now, now.up(), board_state.borders) << endl;
 
 	//return 0;
-
-
-
-
 
 	/*board_state.borders.push_back({ {3,3}, {3,5} });
 	board_state.borders.push_back({ {5,5}, {7,5} });
