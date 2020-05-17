@@ -226,31 +226,13 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 			}
 		}
 
-	if (max_benefit >= 0 || border_count >= 10) {
-		auto new_point = best_way[1];
-		if (player_number == 1) {
-			if (new_point == board_state.second_player)
-				board_state.first_player = best_way[2];
-			else
-				board_state.first_player = new_point;
-		}
-		else {
-			if (new_point == board_state.first_player)
-				board_state.second_player = best_way[2];
-			else
-				board_state.second_player = new_point;
-		}
-
-		return "move " + new_point.to_string();
-
-	}
-	else {
+	if (max_benefit < 0 && border_count < 10) {
 		border best_border;
 		byte new_max_benefit = INT16_MIN;
 
 		vector<border> temp = board_state.borders;
 		for (byte delta = 0; delta < 2; delta++)
-			for (byte i = 1; i <= 7; i++)
+			for (byte i = 1; i <= 8; i++)
 				for (byte j = 2; j <= 9; j++) {
 					border bord = (delta == 0 ? border{ i, j, i + 2, j } : border{ j, i, j, i + 2 });
 					if (board_state.is_valid_border(bord)) {
@@ -266,10 +248,19 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 						temp.pop_back();
 					}
 				}
-		board_state.borders.push_back(best_border);
-		border_count++;
-		return "partition " + best_border.to_string();
+		if (new_max_benefit > max_benefit) {
+			board_state.borders.push_back(best_border);
+			border_count++;
+			return "partition " + best_border.to_string();
+		}
 	}
+
+	point& opponent = (player_number == 1 ? board_state.second_player : board_state.first_player);
+	point& me = (player_number == 1 ? board_state.first_player : board_state.second_player);
+	point& new_point = (best_way[1] == opponent ? best_way[2] : best_way[1]);
+	me = new_point;
+	return "move " + me.to_string();
+
 
 }
 
