@@ -1,4 +1,1 @@
-﻿  bot_battle.cpp
-C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(210,31): warning C4267: инициализация: преобразование из "size_t" в "byte"; возможна потеря данных
-C:\Users\Best PC\Desktop\Context\bot_battle\bot_battle\bot_battle.cpp(211,31): warning C4267: инициализация: преобразование из "size_t" в "byte"; возможна потеря данных
-  bot_battle.vcxproj -> C:\Users\Best PC\Desktop\Context\bot_battle\x64\Debug\bot_battle.exe
+﻿  bot_battle.vcxproj -> C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\x64\Debug\bot_battle.exe

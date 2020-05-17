@@ -172,7 +172,7 @@ vector<way> back_way(const point& now, const byte(&map)[9][9]) {
 
 vector<way> shortest_ways(const vector<border>& borders, const point& player_position, const byte& player_number) {
 	byte field[9][9] = { 0 };
-	field[player_position.x-1][player_position.y-1] = 1;
+	field[player_position.x - 1][player_position.y - 1] = 1;
 
 	vector<point> search{ player_position };
 	byte current = 0;
@@ -222,7 +222,7 @@ byte benefit(const way& player_1, const way& player_2) {
 	return size_1 - size_2;
 }
 
-string our_move(BoardState& board_state, int player_number) {
+string our_move(BoardState& board_state, int player_number, byte& border_count) {
 	way best_way;
 	byte max_benefit = INT16_MIN;
 	for (const way& w1 : shortest_ways(board_state.borders, board_state.first_player, 1))
@@ -234,37 +234,59 @@ string our_move(BoardState& board_state, int player_number) {
 			}
 		}
 
-	vector<border> temp = board_state.borders;
-	border best_border;
+	border best_border{ -1,-1,-1,-1 };
 	byte new_max_benefit = INT16_MIN;
-	for (byte delta = 0; delta < 2; delta++)
-		for (byte i = 1; i <= 7; i++)
-			for (byte j = 2; j <= 9; j++) {
-				border bord = (delta == 0 ? border{ i, j, i + 2, j } : border{ j, i, j, i + 2 });
-				if (board_state.is_valid_border(bord)) {
-					temp.push_back(bord);
-					for (const way& w1 : shortest_ways(temp, board_state.first_player, 1))
-						for (const way& w2 : shortest_ways(temp, board_state.second_player, 2)) {
-							byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
-							if (cur_benefit > new_max_benefit) {
-								new_max_benefit = cur_benefit;
-								best_border = bord;
+	if (border_count <= 10) {
+		vector<border> temp = board_state.borders;
+		for (byte delta = 0; delta < 2; delta++)
+			for (byte i = 1; i <= 7; i++)
+				for (byte j = 2; j <= 9; j++) {
+					border bord = (delta == 0 ? border{ i, j, i + 2, j } : border{ j, i, j, i + 2 });
+					if (board_state.is_valid_border(bord)) {
+						temp.push_back(bord);
+						for (const way& w1 : shortest_ways(temp, board_state.first_player, 1))
+							for (const way& w2 : shortest_ways(temp, board_state.second_player, 2)) {
+								byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
+								if (cur_benefit > new_max_benefit) {
+									new_max_benefit = cur_benefit;
+									best_border = bord;
+								}
 							}
-						}
-					temp.pop_back();
+						temp.pop_back();
+					}
 				}
-			}
+	}
 
-	if (new_max_benefit > max_benefit) {
+	//cout << best_border.to_string() << endl;
+	//for (const point& p : best_way) {
+	//	cout << p << ", ";
+	//}
+	//cout << endl;
+
+	if (border_count < 10 && (new_max_benefit > max_benefit)) {
+		board_state.borders.push_back(best_border);
+		border_count++;
 		return "partition " + best_border.to_string();
 	}
-	else return "move " + best_way[1].to_string();
+	else {
+		auto new_point = best_way[1];
+		if (player_number == 1)
+			board_state.first_player = new_point;
+		else
+			board_state.first_player = new_point;
+
+		return "move " + new_point.to_string();
+	}
 }
 
-void round(BoardState& board_state, const byte& player_number)
+void round(BoardState& board_state, const byte& player_number, byte& border_count)
 {
+	//auto beg = std::chrono::steady_clock::now();
 	if (player_number == 1)
-		cout << our_move(board_state, player_number) << endl;
+		cout << our_move(board_state, player_number, border_count) << endl;
+	//auto end = std::chrono::steady_clock::now();
+
+	//cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
 
 	string opponents_move;
 	cin >> opponents_move;
@@ -286,21 +308,29 @@ void round(BoardState& board_state, const byte& player_number)
 	}
 
 	if (player_number == 2)
-		cout << our_move(board_state, player_number) << endl;
-
+		cout << our_move(board_state, player_number, border_count) << endl;
 }
 
 int main()
 {
 	byte player_number = 1;
-
+	byte border_count = 0;
 	BoardState board_state;
+	//point now = { 1,4 };
+	//board_state.borders.push_back({ 2,4,2,6 });
+	//board_state.borders.push_back({ 3,6,3,8 });
+	//board_state.borders.push_back({ 1,6,3,6 });
+	//board_state.borders.push_back({ 3,2,3,4 });
+	//board_state.borders.push_back({ 4,4,4,6 });
+	//cout << is_neighbours(now, now.up(), board_state.borders) << endl;
+
+	//return 0;
+
+
+
+
+
 	/*board_state.borders.push_back({ {3,3}, {3,5} });
-	board_state.borders.push_back({ {1,5}, {3,5} });
-	board_state.borders.push_back({ {2,5}, {2,7} });
-	board_state.borders.push_back({ {3,6}, {3,8} });
-	board_state.borders.push_back({ {1,8}, {3,8} });
-	board_state.borders.push_back({ {3,5}, {5,5} });
 	board_state.borders.push_back({ {5,5}, {7,5} });
 	board_state.borders.push_back({ {7,5}, {7,7} });
 	board_state.borders.push_back({ {7,7}, {5,7} });
@@ -311,7 +341,7 @@ int main()
 	cin >> player_number;
 	while (true) {
 		//auto beg = std::chrono::steady_clock::now();
-		round(board_state, player_number);
+		round(board_state, player_number, border_count);
 		//auto end = std::chrono::steady_clock::now();
 
 		//cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
