@@ -226,6 +226,8 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 			}
 		}
 
+	cout << " move ben: " << max_benefit << endl;
+
 	if (max_benefit < 0 && border_count < 10) {
 		border best_border;
 		byte new_max_benefit = INT16_MIN;
@@ -248,12 +250,15 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 						temp.pop_back();
 					}
 				}
+		cout << " partition ben: " << new_max_benefit << endl;
+
 		if (new_max_benefit > max_benefit) {
 			board_state.borders.push_back(best_border);
 			border_count++;
 			return "partition " + best_border.to_string();
 		}
 	}
+	cout << endl;
 
 	point& opponent = (player_number == 1 ? board_state.second_player : board_state.first_player);
 	point& me = (player_number == 1 ? board_state.first_player : board_state.second_player);
