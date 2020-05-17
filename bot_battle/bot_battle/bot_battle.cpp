@@ -256,15 +256,29 @@ string our_move(BoardState& board_state, int player_number) {
 			}
 
 	if (new_max_benefit > max_benefit) {
+		board_state.borders.push_back(best_border);
 		return "partition " + best_border.to_string();
 	}
-	else return "move " + best_way[1].to_string();
+	else {
+		auto new_point = best_way[1];
+		if (player_number == 1)
+			board_state.first_player = new_point;
+		else
+			board_state.first_player = new_point;
+
+		return "move " + new_point.to_string();
+	}
 }
 
 void round(BoardState& board_state, const byte& player_number)
 {
-	if (player_number == 1)
+	if (player_number == 1) {
+		//auto beg = std::chrono::steady_clock::now();
 		cout << our_move(board_state, player_number) << endl;
+		/*auto end = std::chrono::steady_clock::now();
+
+		cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;*/
+	}
 
 	string opponents_move;
 	cin >> opponents_move;
@@ -285,8 +299,14 @@ void round(BoardState& board_state, const byte& player_number)
 		board_state.borders.push_back(border{ x1, y1, x2, y2 });
 	}
 
-	if (player_number == 2)
+	if (player_number == 2) {
+		//auto beg = std::chrono::steady_clock::now();
 		cout << our_move(board_state, player_number) << endl;
+
+		/*auto end = std::chrono::steady_clock::now();
+
+		cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;*/
+	}
 
 }
 
@@ -310,11 +330,7 @@ int main()
 
 	cin >> player_number;
 	while (true) {
-		//auto beg = std::chrono::steady_clock::now();
 		round(board_state, player_number);
-		//auto end = std::chrono::steady_clock::now();
-
-		//cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
 	}
 
 }
