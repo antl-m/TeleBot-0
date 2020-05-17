@@ -1,10 +1,6 @@
 ﻿  bot_battle.cpp
 C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(180,17): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(210,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
-C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(211,31): warning C4267: 'initializing': conversion from 'size_t' to 'byte', possible loss of data
-  Generating code
-  3 of 413 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    7 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  bot_battle.vcxproj -> C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\Release\bot_battle.exe
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(229,69): error C2660: 'benefit': function does not take 2 arguments
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(201,6): message : see declaration of 'benefit'
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(249,74): error C2660: 'benefit': function does not take 2 arguments
+C:\Users\Antl_M\Documents\GitHub\TeleBot-0\bot_battle\bot_battle\bot_battle.cpp(201,6): message : see declaration of 'benefit'

@@ -198,16 +198,23 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 	return ways;
 }
 
-byte benefit(const way& player_1, const way& player_2) {
+byte benefit(const way& player_1, const way& player_2, const byte& player_number) {
 	byte size_1 = byte(player_1.size());
 	byte size_2 = byte(player_2.size());
 	for (byte i = 0, my_min = min(size_1, size_2) - 1; i < my_min; i++) {
 		if (player_1[i + 1] == player_2[i + 1]) {
-			size_2--;
+			if (player_number == 1)
+				size_2--;
+			else
+				size_1--;
 			break;
 		}
-		else if (player_1[i + 1] == player_2[i]) {
+		else if (player_number == 1 && player_1[i + 1] == player_2[i]) {
 			size_1--;
+			break;
+		}
+		else if (player_number == 2 && player_2[i + 1] == player_1[i]) {
+			size_2--;
 			break;
 		}
 	}
@@ -219,7 +226,7 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 	byte max_benefit = INT16_MIN;
 	for (const way& w1 : shortest_ways(board_state.borders, board_state.first_player, 1))
 		for (const way& w2 : shortest_ways(board_state.borders, board_state.second_player, 2)) {
-			byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
+			byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2, player_number);
 			if (cur_benefit > max_benefit) {
 				max_benefit = cur_benefit;
 				best_way = (player_number == 1 ? w1 : w2);
@@ -239,7 +246,7 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 						temp.push_back(bord);
 						for (const way& w1 : shortest_ways(temp, board_state.first_player, 1))
 							for (const way& w2 : shortest_ways(temp, board_state.second_player, 2)) {
-								byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2);
+								byte cur_benefit = (player_number == 1 ? -1 : 1) * benefit(w1, w2, player_number);
 								if (cur_benefit > new_max_benefit) {
 									new_max_benefit = cur_benefit;
 									best_border = bord;
