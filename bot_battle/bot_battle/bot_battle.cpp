@@ -207,9 +207,9 @@ vector<way> shortest_ways(const vector<border>& borders, const point& player_pos
 }
 
 byte benefit(const way& player_1, const way& player_2) {
-	byte size_1 = player_1.size();
-	byte size_2 = player_2.size();
-	for (byte i = 0; i < min(size_1, size_2) - 1; i++) {
+	byte size_1 = byte(player_1.size());
+	byte size_2 = byte(player_2.size());
+	for (byte i = 0, my_min = min(size_1, size_2) - 1; i < my_min; i++) {
 		if (player_1[i + 1] == player_2[i + 1]) {
 			size_2--;
 			break;
@@ -289,11 +289,13 @@ string our_move(BoardState& board_state, int player_number, byte& border_count) 
 
 void round(BoardState& board_state, const byte& player_number, byte& border_count)
 {
-	auto beg = std::chrono::steady_clock::now();
-	if (player_number == 1)
+	if (player_number == 1) {
+		auto beg = std::chrono::steady_clock::now();
 		cout << our_move(board_state, player_number, border_count) << endl;
-	auto end = std::chrono::steady_clock::now();
-	cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
+
+		auto end = std::chrono::steady_clock::now();
+		cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
+	}
 
 	string opponents_move;
 	cin >> opponents_move;
@@ -314,8 +316,13 @@ void round(BoardState& board_state, const byte& player_number, byte& border_coun
 		board_state.borders.push_back(border{ x1, y1, x2, y2 });
 	}
 
-	if (player_number == 2)
+	if (player_number == 2) {
+		auto beg = std::chrono::steady_clock::now();
 		cout << our_move(board_state, player_number, border_count) << endl;
+
+		auto end = std::chrono::steady_clock::now();
+		cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - beg).count() << endl;
+	}
 }
 
 int main()
